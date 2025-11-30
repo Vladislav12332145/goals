@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мои цели</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 2em;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            border: 2px solid white;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            background: white;
+            color: #4facfe;
+        }
+        .content {
+            padding: 30px;
+        }
+        .add-goal-form {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4facfe;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .goal-card {
+            background: white;
+            border-left: 5px solid #4facfe;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .goal-card:hover {
+            transform: translateY(-2px);
+        }
+        .goal-card.completed {
+            border-left-color: #28a745;
+            opacity: 0.8;
+        }
+        .goal-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .goal-description {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        .goal-meta {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 15px;
+        }
+        .goal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn-success {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+
+text-decoration: none;
+            font-size: 14px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-state p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-top">
+                <h1>🎯 Мои цели</h1>
+                <a href="/logout" class="btn">Выйти ({{ username }})</a>
+            </div>
+            <p>Управляйте своими целями и достигайте успеха!</p>
+        </div>
+
+        <div class="content">
+            <div class="add-goal-form">
+                <h3>➕ Добавить новую цель</h3>
+                <form method="POST" action="/add_goal">
+                    <div class="form-group">
+                        <label for="title">Название цели:</label>
+                        <input type="text" id="title" name="title" placeholder="Например: Изучить Python" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Описание:</label>
+                        <textarea id="description" name="description" placeholder="Подробное описание цели..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">Добавить цель</button>
+                </form>
+            </div>
+
+            <h3>📋 Список целей:</h3>
+
+            {% if goals %}
+                {% for goal in goals %}
+                <div class="goal-card {% if goal[4] %}completed{% endif %}">
+                    <div class="goal-title">{{ goal[1] }}</div>
+                    {% if goal[2] %}
+                    <div class="goal-description">{{ goal[2] }}</div>
+                    {% endif %}
+                    <div class="goal-meta">
+                        📅 Создано: {{ goal[3] }}
+                        {% if goal[4] %}
+                        | ✅ <strong>Выполнено</strong>
+                        {% else %}
+                        | ⏳ <strong>В процессе</strong>
+                        {% endif %}
+                    </div>
+                    <div class="goal-actions">
+                        {% if not goal[4] %}
+                        <a href="/complete_goal/{{ goal[0] }}" class="btn-success">✅ Выполнено</a>
+                        {% endif %}
+                        <a href="/delete_goal/{{ goal[0] }}" class="btn-danger" onclick="return confirm('Удалить эту цель?')">🗑 Удалить</a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>🎉 У вас пока нет целей!</p>
+                    <p>Добавьте свою первую цель выше 👆</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
